@@ -93,7 +93,7 @@ Looping over the number of :
                    set %if %eval(&flag ne 0 ) %then %do ;
                            pctiles_stored
                        %end;
-                        pctiles_1 ;
+                        pctiles_&iter. ;
             run;
 
             %let flag = 1 ;
