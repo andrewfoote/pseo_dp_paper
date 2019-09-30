@@ -60,9 +60,7 @@ run;
             %put "******************************************************" ;
             %put "EPSILON: &eps. --- NUMBIN: &numbin. --- ITERATION: &iter. " ;
             %put "THIS LOOP STARTED: &runtime." ;
-            %put "******************************************************" ;
-
-            %printjunk;
+            %put "******************************************************" ;            
             
             %histogram_lognormal(&numbin.,&eps,synth) ;
 
