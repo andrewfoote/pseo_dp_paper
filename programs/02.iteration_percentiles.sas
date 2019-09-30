@@ -66,7 +66,6 @@ run;
 
             %histogram_evenspaced(&numbin,&eps,synth) ;
 
-            %printlog;
             data pctiles_&iter. ;
                  merge pctiles_lognorm pctiles_even;
                  by cellid ;
