@@ -60,12 +60,15 @@ run;
             %put "******************************************************" ;
             %put "EPSILON: &eps. --- NUMBIN: &numbin. --- ITERATION: &iter. " ;
             %put "THIS LOOP STARTED: &runtime." ;
-            %put "******************************************************" ;            
+            %put "******************************************************" ;
+
+            %printjunk;
             
             %histogram_lognormal(&numbin.,&eps,synth) ;
 
             %histogram_evenspaced(&numbin,&eps,synth) ;
 
+            %printlog;
             data pctiles_&iter. ;
                  merge pctiles_lognorm pctiles_even;
                  by cellid ;
@@ -136,6 +139,13 @@ data OUTDATA.errors ;
     rel_p50_even = 1- (absL1_p50_even/p50_earn) ;
     rel_p75_even = 1- (absL1_p75_even/p75_earn) ;
 
+    
+    tot_error_lognorm = (L1_p25_lognorm/p25_earn) + (L1_p50_lognorm/p50_earn) + (L1_p75_lognorm/p75_earn);
+    tot_error_even = (L1_p25_even/p25_earn) + (L1_p50_even/p50_earn) + (L1_p75_even/p75_earn) ;
+
+    tot_abserror_lognorm = absL1_p25_lognorm + absL1_p50_lognorm + absL1_p75_lognorm ;
+    tot_abserror_even = absL1_p25_even + absL1_p50_lognorm + absL1_p75_lognorm ;
+
     if cellcount_lognorm<30 then cellbin=1 ;
         else if 30 <= cellcount_lognorm < 50 then cellbin =2 ;
         else if 50 <= cellcount_lognorm < 80 then cellbin =3 ;
@@ -145,6 +155,33 @@ data OUTDATA.errors ;
         else if 300 <= cellcount_lognorm then cellbin = 7 ;
 
 run;
+
+/* adding ranks to the data */
+
+proc sort data=OUTDATA.errors out=error_1 ;
+    by iteration epsilon numbin ;
+run;
+    
+proc rank data=error_1 out=error_rank ;
+     by iteration epsilon numbin ;
+
+     var p25_earn p50_earn p75_earn p25_lognorm p50_lognorm p75_lognorm p25_even p50_even p75_even ;
+     ranks p25_truerank p50_truerank p75_truerank
+           p25_logrank p50_logrank p75_logrank
+           p25_evenrank p50_evenrank p75_evenrank;
+run;
+
+proc corr data=error_rank spearman outp=pearson_measures ;
+    var p25_truerank p50_truerank p75_truerank
+           p25_logrank p50_logrank p75_logrank
+           p25_evenrank p50_evenrank p75_evenrank ;
+    by iteration epsilon numbin ; 
+run;
+
+/* Going to measure the spearman correlation value here */
+
+proc export data=pearson_measures outfile="&outdat./pearson_measures.dta" replace;
+run;    
 
 
 proc summary data=OUTDATA.errors;
@@ -163,7 +200,14 @@ proc summary data=OUTDATA.errors;
              rel_p75_lognorm
              rel_p25_even
              rel_p50_even
-             rel_p75_even) =
+             rel_p75_even
+
+             tot_error_lognorm
+             tot_error_even
+             tot_abserror_lognorm
+             tot_abserror_even
+
+                          ) =
 
         meanL1_p25_lognorm
         meanL1_p50_lognorm
@@ -177,7 +221,14 @@ proc summary data=OUTDATA.errors;
         meanrel_p75_lognorm
         meanrel_p25_even
         meanrel_p50_even
-        meanrel_p75_even ;
+        meanrel_p75_even
+
+        meantot_err_lognorm
+        meantot_err_even
+        meantot_abserr_lognorm
+        meantot_abserr_even
+
+        ;
 run;
 
 
