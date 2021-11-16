@@ -1,4 +1,4 @@
-libname INDATA "[esim data]" ;
+libname INDATA "../data" ;
 libname OUTDATA "[simulation folder]" ;
 
 %let outdat = [outdat] ;
