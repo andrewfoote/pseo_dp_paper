@@ -27,7 +27,7 @@ run;
     %include "config.sas" ;
 
 data synth ;
-    set INDATA.synth ;
+    set INDATA.synthetic_data ;
 run;
 
 proc sort data=synth out=temp2 nodupkey ;

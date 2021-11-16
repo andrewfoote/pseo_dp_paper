@@ -6,7 +6,7 @@
 
 %include "config.sas" ;
 
-proc summary data=INDATA.synth nway ;
+proc summary data=INDATA.synthetic_data nway ;
     class cellid ;
     var ann_earn ;
     outputs out=OUTDATA.simulated_percentiles
